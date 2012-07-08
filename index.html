@@ -28,17 +28,21 @@
 	<meta http-equiv="cleartype" content="on">
 
 	<!-- jQuery Mobile CSS bits -->
-	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.css" />
+	<link rel="stylesheet" href="css/jquery.mobile-1.1.0.min.css" />
 
 	<!-- Custom css -->
 	<link rel="stylesheet" href="css/custom.css" />
 
 	<!-- Javascript includes -->
-	<script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+<!-- XXX min version -->
+	<script src="js/jquery-1.7.1.js"></script>
 	<script src="js/mobileinit.js"></script>
 	<script src="js/ios-orientationchange-fix.min.js"></script>
-	<script src="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.js"></script>
-	<script src="js/application.js"></script>
+	<script src="js/jquery.mobile-1.1.0.min.js"></script>
+	<script src="js/app/app.js"></script>
+	<script src="js/app/reader.js"></script>
+
+
 	<!-- Add a Bookmark Bubble for iDevices, and adds a cookie if already shown -->
 	<script type="text/javascript" src="js/bookmark_bubble.js"></script>
 	<script type="text/javascript" src="js/example.js"></script>
@@ -48,7 +52,16 @@
 	<!-- The script prevents links from opening in mobile safari. https://gist.github.com/1042026 -->
 	<script>(function(a,b,c){if(c in b&&b[c]){var d,e=a.location,f=/^(a|html)$/i;a.addEventListener("click",function(a){d=a.target;while(!f.test(d.nodeName))d=d.parentNode;"href"in d&&(d.href.indexOf("http")||~d.href.indexOf(e.host))&&(a.preventDefault(),e.href=d.href)},!1)}})(document,window.navigator,"standalone")</script>
 </head> 
-<body> 
+<body>
+
+  <div data-role="page" id="reader">
+    <div data-role="header">
+      <a href="" data-role="back">Back</a>
+      <h1></h1>
+    </div>
+  </div>
+
+
 	<div data-role="page">
 
 		<div data-role="header">
