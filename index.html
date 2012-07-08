@@ -29,6 +29,7 @@
 
 	<!-- jQuery Mobile CSS bits -->
 	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.css" />
+<!--	<link rel="stylesheet" href="css/jquery.mobile-1.1.0.min.css" />-->
 
 	<!-- Custom css -->
 	<link rel="stylesheet" href="css/custom.css" />
@@ -38,7 +39,15 @@
 	<script src="js/mobileinit.js"></script>
 	<script src="js/ios-orientationchange-fix.min.js"></script>
 	<script src="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.js"></script>
-	<script src="js/application.js"></script>
+<!--	<script src="js/jquery.mobile-1.1.0.min.js"></script>-->
+
+	<!-- app -->
+	<script src="js/app/app.js"></script>
+	<script src="js/app/Config.js"></script>
+	<script src="js/app/Controller.js"></script>
+	<script src="js/app/TagList.js"></script>
+	<!-- /app -->
+
 	<!-- Add a Bookmark Bubble for iDevices, and adds a cookie if already shown -->
 	<script type="text/javascript" src="js/bookmark_bubble.js"></script>
 	<script type="text/javascript" src="js/example.js"></script>
@@ -49,30 +58,37 @@
 	<script>(function(a,b,c){if(c in b&&b[c]){var d,e=a.location,f=/^(a|html)$/i;a.addEventListener("click",function(a){d=a.target;while(!f.test(d.nodeName))d=d.parentNode;"href"in d&&(d.href.indexOf("http")||~d.href.indexOf(e.host))&&(a.preventDefault(),e.href=d.href)},!1)}})(document,window.navigator,"standalone")</script>
 </head> 
 <body> 
-	<div data-role="page">
+  <!-- Categories -->
+  <div data-role="page" id="page-categories">
+    <div data-role="content" style="padding: 15px">
+      <ul data-role="listview" data-divider-theme="b" data-inset="false" id="list-categories">
+        <li data-role="list-divider" role="heading">
+          Divider
+        </li>
+        <li data-theme="c">
+          <a href="#" data-transition="slide">
+            Button
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
 
-		<div data-role="header">
-			<h1>jQuery Mobile Boilerplate 1.1</h1>
-		</div>
+  <!-- Tag List -->
+  <div data-role="page" id="page-tags">
+    <div data-role="content" style="padding: 15px">
+      <ul data-role="listview" data-divider-theme="b" data-inset="false" id="list-tags">
+        <li data-role="list-divider" role="heading">
+          Divider
+        </li>
+        <li data-theme="c">
+          <a href="#" data-transition="slide">
+            Button
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
 
-		<div data-role="content">
-		
-			<ul data-role="listview" data-inset="true" data-theme="c" data-dividertheme="b">
-				<li data-role="list-divider">Snippet Pages</li>
-				<li><a href="snippets/buttons.html">Buttons</a></li>
-				<li><a href="snippets/grids.html">Grids</a></li>
-				<li><a href="snippets/collapsibles.html">Collapsible Boxes</a></li>
-				<li><a href="snippets/collapsible-sets.html">Collapsible Sets</a></li>
-				<li><a href="snippets/forms.html">Form Elements</a></li>
-				<li><a href="snippets/lists.html">List Views</a></li>
-			</ul>
-
-		</div>
-		
-		<div data-role="footer" data-theme="c">
-			<p>&copy; 2012 - jQuery Mobile Boilerplate</p>
-		</div>	
-		
-	</div>
 </body>
 </html>
