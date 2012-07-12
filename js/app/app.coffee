@@ -1,9 +1,19 @@
 
 window.Readings = {}
-$.fn.Readings = {}
+
+# Readings jquery plugin dispatcher.
+$.fn.Readings =  ->
+  meth = arguments[0]
+  args = []
+  for a in arguments
+    args.push a
+  args.shift()
+  $.fn.Readings[meth].apply(this, args)
 
 
-$(document).on 'pageinit', (ev) ->
+Readings.init = ->
+  if Readings.initialized?
+    return
   Readings.config = new Readings.Config
     wlurl: 'http://readings.local'
     categories:
@@ -12,5 +22,14 @@ $(document).on 'pageinit', (ev) ->
       'genres': 'gatunek',
       'kinds': 'rodzaj',
       'themes': 'motyw'
+  Readings.initialized = true
 
-  Readings.category_list $('#list-categories')
+$(document).on 'pageinit', '#page-categories' , (ev) ->
+  Readings.init()
+  $('#list-categories').Readings 'CategoryList'
+
+rcategory = /category=(\w+)/
+$(document).on 'pageshow', "#page-tags", (ev, ui) ->
+  category = rcategory.exec($(this).attr('data-url'))
+  if category? and category[1]?
+    $(this).Readings 'TagList', category[1]

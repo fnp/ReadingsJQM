@@ -6,34 +6,23 @@ class Readings.Tag
     #@url = record.url
     @slug = $.grep(@href.split('/'), (e) -> e != "")
 
-
   render: ->
-    "<li"
+    "<li><a href=\"#\">#{@name}</a></li>"
 
 $.fn.Readings.TagList = (category) ->
-    this.each ->
-      list = $(this)
-      $.ajax
-        url: Readings.config.get('wlurl') + "/api/#{@category}"
-        contentType: "json"
-        success: (data) ->
-          console.log(data)
-          tags = $.map data, (rec) -> new Readings.Tag(rec)
-          list.empty()
-          for t in tags
-            list.append t.render()
-
-
-class Readings.TagList
-  defaults: null
-  constructor: (list, options) ->
-    @options = $.extend @defaults, options
-    if not list.tag_list?
-      list.tag_list = this
-    list.tag_list
-
-  load: ->
+#  dont_filter = ['kinds']
+  this.each ->
+    $('[data-role=header] h1').text Readings.config.get('categories')[category]
+    list = $('[data-role=listview]', this)
+#    list.listview
+#      filter: dont_filter.indexOf(category) < 0
     $.ajax
-      url: Readings.config.get('wlurl') + "/api/#{@category}"
-      success: ->
-        true
+      url: Readings.config.get('wlurl') + "/api/#{category}"
+      contentType: "json"
+      success: (data) ->
+        console.log(data)
+        tags = $.map data, (rec) -> new Readings.Tag(rec)
+        list.empty()
+        for t in tags
+          list.append t.render()
+        list.listview 'refresh'

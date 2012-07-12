@@ -1,7 +1,16 @@
 # main controller
 
-Readings.category_list = (list) ->
+$.fn.Readings.CategoryList = ->
+  list = $(this)
   list.empty()
   for cat, labelname of Readings.config.get 'categories'
-    list.append "<li><a href=\"#page-tags?category=#{cat}\">#{labelname}</a></li>"
+    list.append "<li><a href=\"tags.html?category=#{cat}\" data-category=\"#{cat}\">#{labelname}</a></li>"
+  # $('a', list).on 'tap', (ev) ->
+  #   ev.preventDefault()
+  #   $i = $(this)
+  #   category = $i.data 'category'
+  #   false
+#    $.mobile.changePage '#page-tags',
+#      category: category
+  console.log("category list updte")
   list.listview 'refresh'
