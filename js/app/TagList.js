@@ -3,7 +3,8 @@
 
   Readings.Tag = (function() {
 
-    function Tag(record) {
+    function Tag(record, category) {
+      this.category = category;
       this.href = record.href;
       this.name = record.name;
       this.slug = $.grep(this.href.split('/'), function(e) {
@@ -15,27 +16,79 @@
       return "<li><a href=\"#\">" + this.name + "</a></li>";
     };
 
+    Tag.prototype.group = function() {
+      if (this.category === 'authors') {
+        return this.name.split(' ').slice(-1)[0][0].toUpperCase();
+      } else {
+        return this.name[0].toUpperCase();
+      }
+    };
+
     return Tag;
 
   })();
+
+  $.fn.Readings.list = function(opts) {
+    return this.each(function() {
+      var list;
+      $('[data-role=header] h1').text(opts.title);
+      list = $('[data-role=listview]', this);
+      if (!opts.filter) {
+        $(".ui-listview-filter").hide();
+      }
+      return $.ajax({
+        url: opts.url,
+        contentType: "json",
+        success: function(data) {
+          var divider, last_divider, obj, objs, _i, _len;
+          objs = $.map(data, opts.mapper);
+          list.empty();
+          last_divider = null;
+          for (_i = 0, _len = objs.length; _i < _len; _i++) {
+            obj = objs[_i];
+            if (opts.dividers) {
+              divider = obj.group();
+              if (last_divider !== divider) {
+                list.append("<li data-role=\"list-divider\">" + divider + "</li>");
+                last_divider = divider;
+              }
+            }
+            list.append(obj.render());
+          }
+          return list.listview('refresh');
+        }
+      });
+    });
+  };
 
   $.fn.Readings.TagList = function(category) {
     return this.each(function() {
       var list;
       $('[data-role=header] h1').text(Readings.config.get('categories')[category]);
       list = $('[data-role=listview]', this);
+      if (Readings.config.get('show_filter').indexOf(category) < 0) {
+        $(".ui-listview-filter").hide();
+      }
       return $.ajax({
         url: Readings.config.get('wlurl') + ("/api/" + category),
         contentType: "json",
         success: function(data) {
-          var t, tags, _i, _len;
-          console.log(data);
+          var last_separator, separator, show_separator, t, tags, _i, _len;
           tags = $.map(data, function(rec) {
-            return new Readings.Tag(rec);
+            return new Readings.Tag(rec, category);
           });
           list.empty();
+          last_separator = null;
+          show_separator = Readings.config.get('show_dividers').indexOf(category) >= 0;
           for (_i = 0, _len = tags.length; _i < _len; _i++) {
             t = tags[_i];
+            if (show_separator) {
+              separator = t.group();
+              if (last_separator !== separator) {
+                list.append("<li data-role=\"list-divider\">" + separator + "</li>");
+                last_separator = separator;
+              }
+            }
             list.append(t.render());
           }
           return list.listview('refresh');

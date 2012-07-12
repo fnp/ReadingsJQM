@@ -28,7 +28,9 @@
         'genres': 'gatunek',
         'kinds': 'rodzaj',
         'themes': 'motyw'
-      }
+      },
+      show_filter: ['authors', 'themes'],
+      show_dividers: ['authors', 'themes']
     });
     return Readings.initialized = true;
   };
@@ -40,11 +42,21 @@
 
   rcategory = /category=(\w+)/;
 
-  $(document).on('pageshow', "#page-tags", function(ev, ui) {
+  $(document).on('pageinit', "#page-tags", function(ev, ui) {
     var category;
     category = rcategory.exec($(this).attr('data-url'));
     if ((category != null) && (category[1] != null)) {
-      return $(this).Readings('TagList', category[1]);
+      return $(this).Readings('list', {
+        category: category[1],
+        url: Readings.config.get('wlurl') + ("/api/" + category[1]),
+        filter: Readings.config.get('show_filter').indexOf(category[1]) >= 0,
+        mapper: function(rec) {
+          return new Readings.Tag(rec, category[1]);
+        },
+        dividers: Readings.config.get('show_dividers').indexOf(category[1]) >= 0
+      });
+    } else {
+      return alert('no category in query string');
     }
   });
 

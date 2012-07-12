@@ -10,7 +10,6 @@
       labelname = _ref[cat];
       list.append("<li><a href=\"tags.html?category=" + cat + "\" data-category=\"" + cat + "\">" + labelname + "</a></li>");
     }
-    console.log("category list updte");
     return list.listview('refresh');
   };
 

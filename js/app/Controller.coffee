@@ -12,5 +12,4 @@ $.fn.Readings.CategoryList = ->
   #   false
 #    $.mobile.changePage '#page-tags',
 #      category: category
-  console.log("category list updte")
   list.listview 'refresh'
