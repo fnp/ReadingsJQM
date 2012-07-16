@@ -17,13 +17,15 @@ Readings.init = ->
   Readings.config = new Readings.Config
     wlurl: 'http://readings.local'
     categories:
-      'authors': 'autor',
-      'epochs': 'epoka',
-      'genres': 'gatunek',
-      'kinds': 'rodzaj',
-      'themes': 'motyw'
+      'author': 'autor',
+      'epoch': 'epoka',
+      'genre': 'gatunek',
+      'kind': 'rodzaj',
+     # 'themes': 'motyw'
     show_filter: [ 'authors', 'themes' ]
     show_dividers: [ 'authors', 'themes']
+    db_version: '1.0'
+  Readings.catalogue = new Readings.Catalogue().open()
   Readings.initialized = true
 
 $(document).on 'pageinit', '#page-categories' , (ev) ->
@@ -31,14 +33,30 @@ $(document).on 'pageinit', '#page-categories' , (ev) ->
   $('#list-categories').Readings 'CategoryList'
 
 rcategory = /category=(\w+)/
+rtag = /tag=([a-z0-9-]+)/
+rtagid = /tag_id=([0-9]+)/
+
 $(document).on 'pageinit', "#page-tags", (ev, ui) ->
   category = rcategory.exec($(this).attr('data-url'))
-  if category? and category[1]?
+  if category?
+    category = category[1]
+    if category?
+      return $(this).Readings 'list',
+#        category: category
+#        url: Readings.config.get('wlurl') + "/api/#{category}"
+        sql: "SELECT * FROM tag WHERE category=? ORDER BY sort_key"
+        params: [category]
+        filter: (Readings.config.get('show_filter').indexOf(category) >= 0)
+        mapper: (rec) -> new Readings.Tag(rec, category)
+        dividers: (Readings.config.get('show_dividers').indexOf(category) >= 0)
+  alert 'no category in query string'
+
+$(document).on 'pageinit', '#page-books', (ev, ui) ->
+  tag_id_m = rtagid.exec($(this).attr('data-url'))
+  tag_id = tag_id_m[1] if tag_id_m?
+
+  tag = Readings.catalogue.withTag tag_id, (tag) =>
     $(this).Readings 'list',
-      category: category[1]
-      url: Readings.config.get('wlurl') + "/api/#{category[1]}"
-      filter: (Readings.config.get('show_filter').indexOf(category[1]) >= 0)
-      mapper: (rec) -> new Readings.Tag(rec, category[1])
-      dividers: (Readings.config.get('show_dividers').indexOf(category[1]) >= 0)
-  else
-    alert 'no category in query string'
+      fetch: (cb) -> Readings.catalogue.withBooks(tag, cb)
+      filter: true
+      dividers: (tag.category != 'author')

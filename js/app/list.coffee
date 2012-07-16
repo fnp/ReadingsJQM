@@ -1,22 +1,4 @@
 
-class Readings.Tag
-  constructor: (record, @category) ->
-    @href = record.href
-    @name = record.name
-    #@url = record.url
-    @slug = $.grep(@href.split('/'), (e) -> e != "")
-
-  render: ->
-    "<li><a href=\"#\">#{@name}</a></li>"
-
-  group: ->
-    if @category == 'authors'
-      # last word, first letter
-      @name.split(' ').slice(-1)[0][0].toUpperCase()
-    else
-      @name[0].toUpperCase()
-
-
 $.fn.Readings.list = (opts) ->
   # category
   # url
@@ -24,31 +6,54 @@ $.fn.Readings.list = (opts) ->
   # title
   # filter
   # mapper (rec) -> obj
+  #
   this.each ->
     $('[data-role=header] h1').text opts.title
     list = $('[data-role=listview]', this)
+    console.log "lst1 #{list.length}"
+
+    # show filter search?
     if !opts.filter
       $(".ui-listview-filter").hide()
-    $.ajax
-      url: opts.url
-      contentType: "json"
-      success: (data) ->
-        objs = $.map data, opts.mapper
-        list.empty()
-        last_divider = null
 
-        for obj in objs
-          # throw a divider in for some categories
-          if opts.dividers
-            divider = obj.group()
-            if last_divider != divider
-              list.append "<li data-role=\"list-divider\">#{divider}</li>"
-              last_divider = divider
+    # display elements
+    render = (objs) =>
+      console.log("lst #{list.length}")
+      list.empty()
+      last_divider = null
 
-          list.append obj.render()
-        list.listview 'refresh'
+      for obj in objs
+        # throw a divider in for some categories
+        if opts.dividers
+          divider = obj.group()
+          if last_divider != divider
+            list.append "<li data-role=\"list-divider\">#{divider}</li>"
+            last_divider = divider
 
+        list.append obj.render()
+      list.listview 'refresh'
 
+    if opts.sql
+      Readings.catalogue.db.transaction (tx) ->
+        tx.executeSql opts.sql, opts.params,
+        (tx, rs) ->
+          objs = []
+          for i in [0...rs.rows.length]
+            objs.push opts.mapper rs.rows.item i
+          render(objs)
+        ,
+        (tx, err) ->
+          window.last_error = err
+          alert "SQL Error while fetching list contents: #{err.message}"
+
+    if opts.url
+      $.ajax
+        url: opts.url
+        contentType: "json"
+        success: (data) -> render($.map(data, opts.mapper))
+
+    if opts.fetch
+      opts.fetch(render)
 
 $.fn.Readings.TagList = (category) ->
   this.each ->
