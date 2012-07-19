@@ -7,23 +7,30 @@ class Readings.Catalogue
     this
 
   init: (db) ->
+    unneded_stmts = (stmt, idx) ->
+      stmt.indexOf("PRAGMA")==0 or
+      stmt.indexOf("BEGIN TRANSACTION")==0 or
+      stmt.indexOf("COMMIT")==0 or
+      /^\s*$/.exec stmt
+
     if not db?
       db = @db
     console.log "initializing DB"
     db.changeVersion "", Readings.config.get 'db_version'
-    $.ajax "initdb.sql"
+    $.ajax Readings.config.get('initdburl'),
       type: "GET"
       dataType: 'text'
       success: (sql) =>
         sql = sql.split /;\n/
-        sql = sql.slice(1,-2)
+        sql = $.grep sql, unneded_stmts, true
 
         create = (tx) =>
           for stmt in sql
-            console.log stmt
             tx.executeSql stmt, [],
               (tx,rs) => true,
-              (tx,err) => console.error(err)
+              (tx,err) =>
+                console.error("error for #{stmt}")
+                console.error(err)
 
         db.transaction create
       error: =>

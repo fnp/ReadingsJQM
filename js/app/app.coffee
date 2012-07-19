@@ -15,7 +15,8 @@ Readings.init = ->
   if Readings.initialized?
     return
   Readings.config = new Readings.Config
-    wlurl: 'http://readings.local'
+    wlurl: 'http://dev.wolnelektury.pl'
+    initdburl: 'http://dev.wolnelektury.pl/media/api/mobile/initial/initial.sql'
     categories:
       'author': 'autor',
       'epoch': 'epoka',
