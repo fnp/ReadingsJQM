@@ -1,6 +1,10 @@
 
+$.fn.Readings.reader = (opts) ->
+  this.each ->
+    Readings.catalogue.fetchBook opts.book_id, true, (book) =>
+      $(this).find("#content-reader").empty().append(book.getText())
 
-$.fn.extend
+
   load_book: (slug) ->
     this.each ->
       $.ajax

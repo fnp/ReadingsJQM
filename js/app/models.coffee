@@ -13,12 +13,44 @@ class Readings.Book
     "<li>
       <a href=\"reader.html?book_id=#{@id}\">
         <img src=\"#{wlurl}#{@cover}\">
-        <h3> #{@title}</h3>
+        <h3>#{@title}</h3>
        </a>
      </li>"
 
   group: ->
     @authors
+
+  is_local: ->
+    html = localStorage.getItem("html:#{@id}")
+    return not (html == null)
+
+  get_text: ->
+    if @_local
+      html = localStorage.getItem("html:#{@id}")
+      return $(html) if html
+    null
+
+  # fetches books content from WL
+  # and pass it to callback
+  fetch: (cb) ->
+    $.ajax Readings.config.get "wlurl" + "/katalog/lektura/#{@slug}.html",
+      type: 'get',
+      dataType: 'html',
+      success: (text) =>
+        text = @mobilize_html text
+        localStorage.setItem("html:#{@id}", text)
+        @_local = 1
+        @db.transaction (tx) =>
+          tx.executeSql "UPDATE _local = 1 WHERE id=?", [@id], (tx, rs) =>
+            cb this
+      error: (er) ->
+        throw Error "Error fetching book text slug=#{@slug}, #{er}"
+
+  mobilize_html: (html) ->
+    html = $(html)
+    book_text = html.find("#book-id")
+    html.find("#download, #header, #themes").delete()
+    book_text
 
 
 class Readings.Tag

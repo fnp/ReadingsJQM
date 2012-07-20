@@ -114,6 +114,28 @@
       });
     };
 
+    Catalogue.prototype.fetchBook = function(book_id, fetch_contents, cb) {
+      var _this = this;
+      if (!(typeof book_id === "number" || /^[0-9]+$/.exec(book_id))) {
+        throw Error("book_id = '" + book_id + "' is not a number");
+      }
+      return this.db.readTransaction(function(tx) {
+        return tx.executeSql("SELECT * FROM book WHERE id=?", [book_id], function(tx, rs) {
+          var book;
+          if (rs.rows.length > 0) {
+            book = new Readings.Book(rs.rows.item(0));
+            if (fetch_contents && !book.is_local()) {
+              return book.fetch(function(book) {
+                return cb(book);
+              });
+            } else {
+              return cb(book);
+            }
+          }
+        });
+      });
+    };
+
     return Catalogue;
 
   })();

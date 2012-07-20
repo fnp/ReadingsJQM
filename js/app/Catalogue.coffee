@@ -76,7 +76,22 @@ class Readings.Catalogue
         @wrap_error()
 
   withBooks: (tag, cb) ->
-    @db.readTransaction (tx)=>
+    @db.readTransaction (tx) =>
       console.log "books in tag: #{tag.books}"
       tx.executeSql "SELECT * FROM book WHERE id IN (#{tag.books}) ORDER BY sort_key",
         [], ((tx, rs) => cb(@map_rs(rs, (rec)->new Readings.Book(rec)))), @wrap_error()
+
+  fetchBook: (book_id, fetch_contents, cb) ->
+    unless typeof book_id == "number" or /^[0-9]+$/.exec book_id
+      throw Error "book_id = '#{book_id}' is not a number"
+
+    @db.readTransaction (tx) =>
+      tx.executeSql "SELECT * FROM book WHERE id=?", [book_id],
+        (tx, rs) =>
+          if rs.rows.length > 0
+            book = new Readings.Book rs.rows.item(0)
+            if fetch_contents and not book.is_local()
+              book.fetch (book) ->
+                cb(book)
+            else
+              return cb(book)

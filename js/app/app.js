@@ -1,5 +1,5 @@
 (function() {
-  var rcategory, rtag, rtagid;
+  var rbookid, rcategory, rtag, rtagid;
 
   window.Readings = {};
 
@@ -45,22 +45,24 @@
 
   rtagid = /tag_id=([0-9]+)/;
 
+  rbookid = /book_id=([0-9]+)/;
+
   $(document).on('pageinit', "#page-tags", function(ev, ui) {
     var category;
     category = rcategory.exec($(this).attr('data-url'));
+    if (category != null) category = category[1];
     if (category != null) {
-      category = category[1];
-      if (category != null) {
-        return $(this).Readings('list', {
-          sql: "SELECT * FROM tag WHERE category=? ORDER BY sort_key",
-          params: [category],
-          filter: Readings.config.get('show_filter').indexOf(category) >= 0,
-          mapper: function(rec) {
-            return new Readings.Tag(rec, category);
-          },
-          dividers: Readings.config.get('show_dividers').indexOf(category) >= 0
-        });
-      }
+      $('h1', this).text(Readings.config.get('categories')[category]);
+      return $(this).Readings('list', {
+        category: category,
+        sql: "SELECT * FROM tag WHERE category=? ORDER BY sort_key",
+        params: [category],
+        filter: Readings.config.get('show_filter').indexOf(category) >= 0,
+        mapper: function(rec) {
+          return new Readings.Tag(rec, category);
+        },
+        dividers: Readings.config.get('show_dividers').indexOf(category) >= 0
+      });
     }
     return alert('no category in query string');
   });
@@ -78,6 +80,15 @@
         filter: true,
         dividers: tag.category !== 'author'
       });
+    });
+  });
+
+  $(document).on('pageinit', '#page-reader', function(ev, ui) {
+    var book_id, book_id_m;
+    book_id_m = rbookid.exec($(this).attr('data-url'));
+    if (book_id_m != null) book_id = book_id_m[1];
+    return $(this).Readings('reader', {
+      book_id: book_id
     });
   });
 
